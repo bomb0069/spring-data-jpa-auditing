@@ -1,18 +1,26 @@
 package com.example.product;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.management.remote.JMXServerErrorException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
@@ -85,4 +93,58 @@ public class ProductControllerWebMvcTest {
         assertEquals(2, error.getProductId());
         assertEquals("Product Not Found", error.getMessage());
     }
+
+    @Test
+    public void create_product_no_2_should_be_return_http_status_code_201_CREATED() throws Exception {
+        Optional<Product> productOptional = Optional.empty();
+
+        given(productRepository.findById(2)).willReturn(productOptional);
+
+        given(productRepository.save(any(Product.class))).willReturn(new Product());
+
+        ProductRequest request = new ProductRequest(2, "43 Piece dinner Set", 18.95, "/43_Piece_dinner_Set.png");
+        ObjectMapper mapper = new ObjectMapper();
+        String requestString = mapper.writeValueAsString(request);
+
+        String result = this.mvc.perform(
+                post("/api/v1/product/2")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(requestString)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertEquals("Product Create Successful", result);
+
+    }
+
+    @Test
+    public void create_existing_product_id_should_be_return_http_status_code_409_CONFLICT() throws Exception {
+        Optional<Product> productOptional = Optional.of(new Product());
+
+        given(productRepository.findById(2)).willReturn(productOptional);
+
+        ProductRequest request = new ProductRequest(2, "43 Piece dinner Set", 18.95, "/43_Piece_dinner_Set.png");
+        ObjectMapper mapper = new ObjectMapper();
+        String requestString = mapper.writeValueAsString(request);
+
+
+        String result = this.mvc.perform(
+                post("/api/v1/product/2")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(requestString)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        ProductErrorResponse error = mapper.readValue(result, ProductErrorResponse.class);
+
+        assertEquals(2, error.getProductId());
+        assertEquals("Can't Create This Product ID. It's Already Exist", error.getMessage());
+    }
+
 }

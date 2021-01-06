@@ -12,4 +12,10 @@ public class ProductControllerHandler {
     public ResponseEntity<ProductErrorResponse> handleProductNotFoundException(ProductNotFoundException exception) {
         return new ResponseEntity<ProductErrorResponse>(new ProductErrorResponse(exception.getProductId(), exception.getMessage()), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(ProductAlreadyExistException.class)
+    public ResponseEntity<ProductErrorResponse> handleProductAlreadyExistException(ProductAlreadyExistException exception) {
+        return new ResponseEntity<ProductErrorResponse>(new ProductErrorResponse(exception.getProductId(), exception.getMessage()), HttpStatus.CONFLICT);
+    }
+
 }

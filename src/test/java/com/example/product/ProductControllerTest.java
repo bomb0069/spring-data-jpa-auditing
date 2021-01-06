@@ -47,4 +47,13 @@ public class ProductControllerTest {
 
     }
 
+    @Test
+    public void create_existing_product_id_should_be_return_http_status_code_409_CONFLICT() {
+        repository.save(product43PieceDinnerSet);
+
+        ResponseEntity<String> result = testRestTemplate.postForEntity("/api/v1/product/2", new ProductRequest(2, "43 Piece dinner Set", 18.95, "/43_Piece_dinner_Set.png"), String.class);
+
+        assertEquals(HttpStatus.CONFLICT, result.getStatusCode());
+
+    }
 }

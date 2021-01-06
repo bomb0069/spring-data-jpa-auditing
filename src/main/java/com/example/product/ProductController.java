@@ -33,6 +33,11 @@ public class ProductController {
 
     @PostMapping("/api/v1/product/{id}")
     public ResponseEntity<String> createNewProduct(@RequestBody ProductRequest productRequest) {
+        Optional<Product> product = productRepository.findById(productRequest.getProductId());
+        if(product.isPresent()) {
+            throw new ProductAlreadyExistException(productRequest.getProductId());
+        }
+
         productRepository.save(new Product(productRequest.getProductId(), productRequest.getProductName(), productRequest.getProductPrice(), productRequest.getProductImage()));
         return new ResponseEntity<>("Product Create Successful", HttpStatus.CREATED);
     }
