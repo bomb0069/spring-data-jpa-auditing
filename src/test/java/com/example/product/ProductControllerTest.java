@@ -35,7 +35,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void create_product_no_3_should_be_return_status_code_201 () {
+    public void create_product_no_3_should_be_return_http_status_code_201_CREATED_and_when_get_3_it_should_be_43_Piece_dinner_Set_2 () {
 
         ResponseEntity<String> result = testRestTemplate.postForEntity("/api/v1/product/3", new ProductRequest(3, "43 Piece dinner Set 2", 18.95, "/43_Piece_dinner_Set_2.png"), String.class);
 
