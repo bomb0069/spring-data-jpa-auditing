@@ -38,7 +38,7 @@ status code : 200
     "product_image": "/43_Piece_dinner_Set.png",
     "quantity": 10,
     "product_brand": "CoolKidz",
-    "last_update": "2021-01-06 13:47:05.886"
+    "last_update": "2021-01-06T13:47:05.886"
 }
 ```
 

@@ -1,14 +1,33 @@
 package com.example.product;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 @RestController
 public class ProductController {
 
+    @Autowired
+    ProductRepository productRepository;
+
     @GetMapping("/api/v1/product/{id}")
     public ProductDetailResponse getProductById (@PathVariable Integer id) {
-        return new ProductDetailResponse(2, "43 Piece dinner Set", 12.95, "/43_Piece_dinner_Set.png", 10, "CoolKidz", "2021-01-06 13:47:05.886");
+
+        Optional<Product> product = productRepository.findById(id);
+        if (product.isPresent()) {
+            ProductDetailResponse productResponse = new ProductDetailResponse();
+            productResponse.setId(product.get().getId());
+            productResponse.setProductName(product.get().getProductName());
+            productResponse.setProductPrice(product.get().getProductPrice());
+            productResponse.setProductImage(product.get().getImageUrl());
+            productResponse.setQuantity(product.get().getQuantity());
+            productResponse.setProductBrand(product.get().getProductBrand());
+            productResponse.setLastUpdate(product.get().getModified().toString());
+            return productResponse;
+        }
+        return null;
     }
 }
