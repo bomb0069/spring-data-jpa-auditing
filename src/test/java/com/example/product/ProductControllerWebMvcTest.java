@@ -27,7 +27,7 @@ public class ProductControllerWebMvcTest {
     private MockMvc mvc;
 
     @Test
-    public void get_product_no_1_with_initial_should_be_return_Balance_Training_Bicycle () throws Exception {
+    public void get_product_no_1_with_initial_should_be_return_Balance_Training_Bicycle() throws Exception {
 
         Optional<Product> productOptional = Optional.of(new Product(1, "Balance Training Bicycle", 119.95, "/Balance_Training_Bicycle.png"));
 
@@ -46,4 +46,43 @@ public class ProductControllerWebMvcTest {
         assertEquals("Balance Training Bicycle", product.getProductName());
     }
 
+    @Test
+    public void get_product_no_1_without_initial_should_be_return_status_code_404_with_error_message_Product_Not_Found() throws Exception {
+
+        Optional<Product> productOptional = Optional.empty();
+
+        given(productRepository.findById(1)).willReturn(productOptional);
+
+        String result = this.mvc.perform(get("/api/v1/product/1"))
+                .andExpect(status().isNotFound())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        ObjectMapper mapper = new ObjectMapper();
+        ProductErrorResponse error = mapper.readValue(result, ProductErrorResponse.class);
+
+        assertEquals(1, error.getProductId());
+        assertEquals("Product Not Found", error.getMessage());
+    }
+
+    @Test
+    public void get_product_no_2_without_initial_should_be_return_status_code_404_with_error_message_Product_Not_Found() throws Exception {
+
+        Optional<Product> productOptional = Optional.empty();
+
+        given(productRepository.findById(1)).willReturn(productOptional);
+
+        String result = this.mvc.perform(get("/api/v1/product/2"))
+                .andExpect(status().isNotFound())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        ObjectMapper mapper = new ObjectMapper();
+        ProductErrorResponse error = mapper.readValue(result, ProductErrorResponse.class);
+
+        assertEquals(2, error.getProductId());
+        assertEquals("Product Not Found", error.getMessage());
+    }
 }

@@ -14,20 +14,20 @@ public class ProductController {
     ProductRepository productRepository;
 
     @GetMapping("/api/v1/product/{id}")
-    public ProductDetailResponse getProductById (@PathVariable Integer id) {
+    public ProductDetailResponse getProductById(@PathVariable Integer id) {
 
         Optional<Product> product = productRepository.findById(id);
-        if (product.isPresent()) {
-            ProductDetailResponse productResponse = new ProductDetailResponse();
-            productResponse.setId(product.get().getId());
-            productResponse.setProductName(product.get().getProductName());
-            productResponse.setProductPrice(product.get().getProductPrice());
-            productResponse.setProductImage(product.get().getImageUrl());
-            productResponse.setQuantity(product.get().getQuantity());
-            productResponse.setProductBrand(product.get().getProductBrand());
-            productResponse.setLastUpdate(product.get().getModified().toString());
-            return productResponse;
+        if (product.isEmpty()) {
+            throw new ProductNotFoundException(id);
         }
-        return null;
+        ProductDetailResponse productResponse = new ProductDetailResponse();
+        productResponse.setId(product.get().getId());
+        productResponse.setProductName(product.get().getProductName());
+        productResponse.setProductPrice(product.get().getProductPrice());
+        productResponse.setProductImage(product.get().getImageUrl());
+        productResponse.setQuantity(product.get().getQuantity());
+        productResponse.setProductBrand(product.get().getProductBrand());
+        productResponse.setLastUpdate(product.get().getModified().toString());
+        return productResponse;
     }
 }
